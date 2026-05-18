@@ -1150,6 +1150,15 @@ elseif(USE_CUDA)
 
 endif()
 
+# Fail clang-cl builds on dllimport/dllexport mismatches in torch_cpu and torch_hip.
+if(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  foreach(_lib IN ITEMS torch_cpu torch_hip)
+    if(TARGET ${_lib})
+      target_compile_options_if_supported(${_lib} "-Werror=inconsistent-dllimport")
+    endif()
+  endforeach()
+endif()
+
 if(USE_XPU)
   list(APPEND Caffe2_XPU_SRCS ${GENERATED_CXX_TORCH_XPU})
   list(APPEND Caffe2_XPU_SRCS ${TORCH_SRC_DIR}/csrc/inductor/aoti_torch/shim_xpu.cpp)
