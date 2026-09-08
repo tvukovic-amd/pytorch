@@ -83,15 +83,12 @@ class TestLicense(TestCase):
 
     def test_audit_missing_license_file(self) -> None:
         present = [("third_party/shipped/LICENSE", "MIT\n")]
-        present += [
-            (f"third_party/dep{i}/LICENSE", "MIT\n") for i in range(9)
-        ]
+        present += [(f"third_party/dep{i}/LICENSE", "MIT\n") for i in range(9)]
         listed = [p for p, _ in present] + ["third_party/removed/LICENSE"]
         paths_literal = ", ".join(f'"{p}"' for p in listed)
         errors, skip_reason = _audit_fixture(
             f'license = "MIT"\nlicense-files = [{paths_literal}]',
-            'excluded = []\n\n[[spdx]]\nexpression = "MIT"\n'
-            f"paths = [{paths_literal}]",
+            f'excluded = []\n\n[[spdx]]\nexpression = "MIT"\npaths = [{paths_literal}]',
             present,
         )
         self.assertIsNone(skip_reason)
@@ -106,8 +103,7 @@ class TestLicense(TestCase):
         paths_literal = ", ".join(listed)
         errors, skip_reason = _audit_fixture(
             f'license = "MIT"\nlicense-files = [{paths_literal}]',
-            'excluded = []\n\n[[spdx]]\nexpression = "MIT"\n'
-            f"paths = [{paths_literal}]",
+            f'excluded = []\n\n[[spdx]]\nexpression = "MIT"\npaths = [{paths_literal}]',
             [("LICENSE", "MIT\n"), ("third_party/present/LICENSE", "MIT\n")],
         )
         self.assertIsNone(skip_reason)
